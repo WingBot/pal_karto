@@ -1,28 +1,22 @@
 /*
  * slam_karto
+ *
  * Copyright (c) 2008, Willow Garage, Inc.
+ *   Authors: Brian Gerkey
+ * Copyright (c) 2014, PAL Robotics, SL.
+ *   Authors: Enrico Mingo / Luca Marchionni / Siegfried-A. Gevatter
  *
  * THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE
  * COMMONS PUBLIC LICENSE ("CCPL" OR "LICENSE"). THE WORK IS PROTECTED BY
  * COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS
  * AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
- * 
+ *
  * BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO
  * BE BOUND BY THE TERMS OF THIS LICENSE. THE LICENSOR GRANTS YOU THE RIGHTS
  * CONTAINED HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND
  * CONDITIONS.
  *
  */
-
-/* Author: Brian Gerkey */
-
-/**
-
-@mainpage karto_gmapping
-
-@htmlinclude manifest.html
-
-*/
 
 #include "ros/ros.h"
 #include "ros/console.h"
@@ -226,7 +220,7 @@ SlamKarto::getLaser(const sensor_msgs::LaserScan::ConstPtr& scan)
     {
       tf_.transformPose(base_frame_, ident, laser_pose);
     }
-    catch(tf::TransformException e)
+    catch(const tf::TransformException& e)
     {
       ROS_WARN("Failed to compute laser pose, aborting initialization (%s)",
 	       e.what());
@@ -254,7 +248,7 @@ SlamKarto::getLaser(const sensor_msgs::LaserScan::ConstPtr& scan)
       tf_.transformQuaternion(base_frame_, min_q, min_q);
       tf_.transformQuaternion(base_frame_, max_q, max_q);
     }
-    catch(tf::TransformException& e)
+    catch(const tf::TransformException& e)
     {
       ROS_WARN("Unable to transform min/max laser angles into base frame: %s",
                e.what());

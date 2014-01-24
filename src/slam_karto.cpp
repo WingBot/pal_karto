@@ -40,10 +40,13 @@
 #include <map>
 #include <vector>
 
+#include <pal_karto/KartoConfig.h>
+#include <dynamic_reconfigure/server.h>
+
 // compute linear index for given map coords
 #define MAP_IDX(sx, i, j) ((sx) * (j) + (i))
 
-class SlamKarto
+class SlamKarto : boost::noncopyable
 {
 public:
   SlamKarto();
@@ -60,6 +63,20 @@ private:
   void publishTransform();
   void publishLoop(double transform_publish_period);
   void publishGraphVisualization();
+
+  void reconfigureCB(pal_karto::KartoConfig &config, uint32_t level);
+  std::auto_ptr<dynamic_reconfigure::Server<pal_karto::KartoConfig> > dsrv_;
+  pal_karto::KartoConfig config_, default_config_;
+  bool setup_;
+
+  void initConfig();
+
+  template<typename T>
+  inline void setParam(const std::string& param_name, T value)
+  {
+    mapper_->SetParameter(param_name, value);
+    ROS_INFO_STREAM("   " << param_name << " " << value);
+  }
 
   // ROS handles
   ros::NodeHandle node_;
@@ -105,7 +122,10 @@ SlamKarto::SlamKarto() :
   got_map_(false),
   laser_count_(0),
   transform_thread_(NULL),
-  marker_count_(0)
+  marker_count_(0),
+  config_(),
+  default_config_(),
+  setup_(false)
 {
   map_to_odom_.setIdentity();
   // Retrieve parameters
@@ -142,6 +162,10 @@ SlamKarto::SlamKarto() :
   scan_filter_->registerCallback(boost::bind(&SlamKarto::laserCallback, this, _1));
   marker_publisher_ = node_.advertise<visualization_msgs::MarkerArray>("visualization_marker_array", 1);
 
+  dsrv_.reset(new dynamic_reconfigure::Server<pal_karto::KartoConfig>(ros::NodeHandle("slam_karto")));
+  dynamic_reconfigure::Server<pal_karto::KartoConfig>::CallbackType cb = boost::bind(&SlamKarto::reconfigureCB, this, _1, _2);
+  dsrv_->setCallback(cb);
+
   // Create a thread to periodically publish the latest map->odom
   // transform; it needs to go out regularly, uninterrupted by potentially
   // long periods of computation in our main loop.
@@ -150,6 +174,8 @@ SlamKarto::SlamKarto() :
   // Initialize Karto structures
   mapper_ = new karto::Mapper();
   dataset_ = new karto::Dataset();
+
+  initConfig();
 
   // Set solver to be used in loop closure
   solver_ = new SpaSolver();
@@ -388,6 +414,62 @@ SlamKarto::publishGraphVisualization()
   marker_count_ = marray.markers.size();
 
   marker_publisher_.publish(marray);
+}
+
+void
+SlamKarto::reconfigureCB(pal_karto::KartoConfig &config, uint32_t level)
+{
+  if (setup_ && config.restore_defaults)
+  {
+    config_ = default_config_;
+    // Avoid looping
+    config_.restore_defaults = false;
+  }
+  if (!setup_)
+  {
+    default_config_ = config;
+    config_ = config;
+    setup_ = true;
+  }
+  else if (setup_)
+  {
+    config_ = config;
+  }
+}
+
+void SlamKarto::initConfig()
+{
+  ROS_INFO_STREAM("Initializing Karto configuration...");
+
+  setParam("UseScanMatching", config_.use_scan_matching);
+  setParam("UseScanBarycenter", config_.use_scan_barycenter);
+  setParam("MinimumTravelDistance", config_.minimum_travel_distance);
+  setParam("MinimumTravelHeading", config_.minimum_travel_heading);
+  setParam("ScanBufferSize", config_.scan_buffer_size);
+  setParam("ScanBufferMaximumScanDistance", config_.scan_buffer_maximum_scan_distance);
+  setParam("LinkMatchMinimumResponseFine", config_.link_match_minimum_response_fine);
+  setParam("LinkScanMaximumDistance", config_.link_scan_maximum_distance);
+  setParam("LoopSearchMaximumDistance", config_.loop_search_maximum_distance);
+  setParam("LoopMatchMinimumChainSize", config_.loop_match_minimum_chain_size);
+  setParam("LoopMatchMaximumVarianceCoarse", config_.loop_match_maximum_variance_coarse);
+  setParam("LoopMatchMinimumResponseCoarse", config_.loop_match_minimum_response_coarse);
+  setParam("LoopMatchMinimumResponseFine", config_.loop_match_minimum_response_fine);
+  setParam("CorrelationSearchSpaceDimension", config_.correlation_search_space_dimension);
+  setParam("CorrelationSearchSpaceResolution", config_.correlation_search_space_resolution);
+  setParam("CorrelationSearchSpaceSmearDeviation", config_.correlation_search_space_smear_deviation);
+  setParam("LoopSearchSpaceDimension", config_.loop_search_space_dimension);
+  setParam("LoopSearchSpaceResolution", config_.loop_search_space_resolution);
+  setParam("LoopSearchSpaceSmearDeviation", config_.loop_search_space_smear_deviation);
+  setParam("DistanceVariancePenalty", config_.distance_variance_penalty);
+  setParam("AngleVariancePenalty", config_.angle_variance_penalty);
+  setParam("FineSearchAngleOffset", config_.fine_search_angle_offset);
+  setParam("CoarseSearchAngleOffset", config_.coarse_search_angle_offset);
+  setParam("CoarseAngleResolution", config_.coarse_angle_resolution);
+  setParam("MinimumAnglePenalty", config_.minimum_angle_penalty);
+  setParam("MinimumDistancePenalty", config_.minimum_distance_penalty);
+  setParam("UseResponseExpansion", config_.use_response_expansion);
+
+  //minimum_travel_distance_squared = pow(config_.minimum_travel_distance, 2);
 }
 
 void

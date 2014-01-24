@@ -1,0 +1,31 @@
+# Scan Matcher:
+use_scan_matching                : true
+distance_variance_penalty        : 0.3
+angle_variance_penalty           : 0.121839781
+fine_search_angle_offset         : 0.00349066 # 0.2 rad
+coarse_search_angle_offset       : 0.34906585 # 20 rad
+coarse_angle_resolution          : 0.03490659 # 2 rad
+minimum_angle_penalty            : 0.9
+minimum_distance_penalty         : 0.5
+use_response_expansion           : false
+scan_buffer_maximum_scan_distance: 10 # default: 20
+scan_buffer_size                 : 60 # default: # 80 ~= scan_buffer_max_scan_dist / min_travel_dist
+
+# Correlation:
+correlation_search_space_dimension      : 0.3
+correlation_search_space_resolution     : 0.01
+correlation_search_space_smear_deviation: 0.03
+
+# Loop Closing:
+loop_search_maximum_distance      : 10.0
+loop_match_maximum_variance_coarse: 0.9 # default: 0.16
+loop_match_minimum_chain_size     : 10
+loop_match_minimum_response_coarse: 0.3 # default: 0.8
+loop_match_minimum_response_fine  : 0.4
+loop_search_space_dimension       : 5.0 # default: 8
+loop_search_space_resolution      : 0.05 # default: 0.05 we were using 0.01
+loop_search_space_smear_deviation : 0.03
+link_match_minimum_response_fine  : 0.4 # default: 0.8
+link_scan_maximum_distance        : 8.0 # default: 10.0
+
+restore_defaults: false

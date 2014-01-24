@@ -47,8 +47,11 @@ public:
 
   // Get the underlying graph from SBA
   // return the graph of constraints
-  /// x,y -> x',y'   4 floats per connection
-  void getGraph(std::vector<float> &g) { m_Spa.getGraph(g); }
+  // / x,y -> x',y'   4 floats per connection
+  void getGraph(std::vector<float>& g)
+  {
+    m_Spa.getGraph(g);
+  }
 
 private:
   karto::ScanSolver::IdPoseVector corrections;

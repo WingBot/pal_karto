@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pal_karto)
 
-set(ROS_DEPS tf sensor_msgs visualization_msgs roscpp rosconsole nav_msgs message_filters sba open_karto dynamic_reconfigure)
+set(ROS_DEPS tf sensor_msgs visualization_msgs roscpp rosconsole nav_msgs message_filters sba open_karto dynamic_reconfigure message_generation pal_map_utils)
 
 find_package(catkin REQUIRED COMPONENTS ${ROS_DEPS})
 find_package(Eigen REQUIRED)
+
+set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+
+add_service_files(
+  FILES
+  UseScanMatching.srv
+)
+generate_messages()
 
 generate_dynamic_reconfigure_options(cfg/Karto.cfg)
 

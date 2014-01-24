@@ -1,0 +1,12 @@
+<launch>
+  <arg name="scan" default="scan"/>
+
+  <arg name="trajectory_file" default="$(find pal_karto)/config/trajectory.yaml" />
+
+  <node pkg="pal_karto" type="slam_karto" name="slam_karto" output="screen">
+    <rosparam file="$(find pal_karto)/config/karto.yaml" command="load" />
+    <param name="trajectory_file" value="$(arg trajectory_file)"/>
+
+    <remap from="scan" to="$(arg scan)"/>
+  </node>
+</launch>

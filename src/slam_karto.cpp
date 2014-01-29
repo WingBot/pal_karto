@@ -151,8 +151,6 @@ public:
   std::string getKartoState();
 
 private:
-  boost::mutex _karto_mutex;
-
   bool startKarto();
   bool getOdomPose(karto::Pose2& karto_pose, const ros::Time& t);
   karto::LaserRangeFinder* getLaser(const sensor_msgs::LaserScan::ConstPtr& scan);
@@ -966,8 +964,6 @@ void SlamKarto::generateTrajectory(const karto::LocalizedRangeScanVector &scans)
 bool
 SlamKarto::updateMap()
 {
-  boost::mutex::scoped_lock kartoLock(_karto_mutex);
-
   boost::mutex& mutx = slam_listener_.mutex();
   boost::mutex::scoped_lock lock(mutx, boost::try_to_lock);
   if (!lock)
@@ -1072,8 +1068,6 @@ SlamKarto::addScan()
 
   // Note that the queue size may still increase.
   ROS_DEBUG("Starting processing scans... Queue size is: %zu", range_scan_queue.size());
-
-  boost::mutex::scoped_lock kartoLock(_karto_mutex);
 
   int numProcessedScans = 0;
   while (!range_scan_queue.empty())

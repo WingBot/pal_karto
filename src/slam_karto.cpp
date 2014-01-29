@@ -166,10 +166,6 @@ private:
   void publishGraphVisualization();
 
   void reconfigureCB(pal_karto::KartoConfig &config, uint32_t level);
-  std::auto_ptr<dynamic_reconfigure::Server<pal_karto::KartoConfig> > dsrv_;
-  pal_karto::KartoConfig config_, default_config_;
-  bool setup_;
-
   void initConfig();
 
   template<typename T>
@@ -267,6 +263,10 @@ private:
   std::string path_to_trajectory_file_;
 
   bool inverted_laser_;
+
+  std::auto_ptr<dynamic_reconfigure::Server<pal_karto::KartoConfig> > dsrv_;
+  pal_karto::KartoConfig config_, default_config_;
+  bool setup_;
 };
 
 const std::string SlamKarto::_kartoStateStart = "started";

@@ -8,5 +8,6 @@
     <param name="trajectory_file" value="$(arg trajectory_file)"/>
 
     <remap from="scan" to="$(arg scan)"/>
+    <remap from="dynamic_map" to="static_map"/>
   </node>
 </launch>

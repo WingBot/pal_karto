@@ -182,7 +182,6 @@ private:
   tf::Transform offsetOdom_;
   void printInformationMatrix();
   void getCovarianceMatrix(geometry_msgs::PoseWithCovarianceStamped &pose);
-  bool maxRangeScanFilter(const sensor_msgs::LaserScan::ConstPtr& scan);
   ros::Publisher informationMatrixPub_;
 
   void stopThreads();
@@ -733,36 +732,6 @@ SlamKarto::publishGraphVisualization()
   marker_count_ = marray.markers.size();
 
   marker_publisher_.publish(marray);
-}
-
-bool SlamKarto::maxRangeScanFilter(const sensor_msgs::LaserScan::ConstPtr &scan)
-{
-  sensor_msgs::LaserScan laser = *scan;
-  int valid_ranges_count = 0;
-  int n_ranges = laser.ranges.size();
-  double valid_ranges_threshold = floor(0.2 * n_ranges);
-  //ROS_INFO("N. of rays is %i , Valid Range Threshold %f", n_ranges,valid_ranges_threshold);
-  float max_range = laser.range_max;
-  //ROS_INFO("Max Range %f", max_range);
-  for (int i = 0; i < n_ranges; i++)
-  {
-    //ROS_INFO("Laser Range %f", laser.ranges.at(i));
-    if (laser.ranges.at(i) < max_range * (1.0 - 0.05))
-    {
-      valid_ranges_count++;
-    }
-  }
-  //ROS_INFO("Valid Range count %i", valid_ranges_count);
-  if (valid_ranges_count >= (int) valid_ranges_threshold)
-  {
-    //ROS_INFO("Scan Accetped!");
-    return true;
-  }
-  else
-  {
-    //ROS_INFO("Scan Filtered!");
-    return false;
-  }
 }
 
 void SlamKarto::reconfigureCB(pal_karto::KartoConfig &config, uint32_t level)

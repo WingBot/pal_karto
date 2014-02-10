@@ -23,4 +23,12 @@ add_executable(slam_karto src/slam_karto.cpp src/spa_solver.cpp)
 add_dependencies(slam_karto ${PROJECT_NAME}_gencfg)
 target_link_libraries(slam_karto ${catkin_LIBRARIES})
 
+install(TARGETS slam_karto
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+foreach(dir launch config)
+    install(DIRECTORY ${dir}/
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
+endforeach(dir)
+
 catkin_package()

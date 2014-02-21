@@ -904,7 +904,7 @@ void SlamKarto::generateTrajectory(const karto::LocalizedRangeScanVector &scans)
   for (iter = scans.begin(); iter != scans.end(); ++iter)
   {
     karto::LocalizedRangeScan *scan = *iter;
-    const karto::Pose2 kPose = scan->GetCorrectedPose();
+    const karto::Pose2 &kPose = scan->GetCorrectedPose();
     geometry_msgs::Pose pose;
     pose.position.x = kPose.GetX();
     pose.position.y = kPose.GetY();

@@ -569,30 +569,21 @@ SlamKarto::getLaser(const sensor_msgs::LaserScan::ConstPtr& scan)
              laser_pose.getOrigin().x(),
              laser_pose.getOrigin().y(),
              yaw);
-    // To account for lasers that are mounted upside-down, we determine the
-    // min, max, and increment angles of the laser in the base frame.
-    tf::Quaternion q;
-    q.setRPY(0.0, 0.0, scan->angle_min);
-    tf::Stamped<tf::Quaternion> min_q(q, scan->header.stamp,
-                                      scan->header.frame_id);
-    q.setRPY(0.0, 0.0, scan->angle_max);
-    tf::Stamped<tf::Quaternion> max_q(q, scan->header.stamp,
-                                      scan->header.frame_id);
+
+    // We need to account for lasers that are mounted upside-down.
+    tf::Vector3 up_vector(0., 0., 1.);
+    tf::Stamped<tf::Vector3> vz(up_vector, scan->header.stamp, scan->header.frame_id);
     try
     {
-      tf_.transformQuaternion(base_frame_, min_q, min_q);
-      tf_.transformQuaternion(base_frame_, max_q, max_q);
+      tf_.transformVector(base_frame_, vz, vz);
     }
     catch (const tf::TransformException& e)
     {
-      ROS_WARN("Unable to transform min/max laser angles into base frame: %s",
-               e.what());
+      ROS_WARN("Unable to transform to base frame: %s", e.what());
       return false;
     }
-
-    double angle_min = tf::getYaw(min_q);
-    double angle_max = tf::getYaw(max_q);
-    bool inverse = lasers_inverted_[scan->header.frame_id] = angle_max < angle_min;
+    ROS_ERROR_COND(vz.z() != 1 && vz.z() != -1, "Unexpected result transforming (0, 0, 1) to base frame.");
+    bool inverse = lasers_inverted_[scan->header.frame_id] = vz.z() < 0;
     if (inverse)
       ROS_INFO("laser is mounted upside-down");
 

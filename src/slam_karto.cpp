@@ -45,6 +45,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <cmath>
 
 #include <pal_karto/KartoConfig.h>
 #include <dynamic_reconfigure/server.h>
@@ -857,7 +858,7 @@ void SlamKarto::laserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
            it != scan->ranges.rend();
            ++it)
       {
-        if ((*it) < scan->range_min)
+        if (!std::isfinite(*it) || (*it) < scan->range_min || scan->range_max < (*it))
           readings.push_back(scan->range_max);
         else
           readings.push_back(*it);
@@ -867,7 +868,7 @@ void SlamKarto::laserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
            it != scan->ranges.end();
            ++it)
       {
-        if ((*it) < scan->range_min)
+        if (!std::isfinite(*it) || (*it) < scan->range_min || scan->range_max < (*it))
           readings.push_back(scan->range_max);
         else
           readings.push_back(*it);

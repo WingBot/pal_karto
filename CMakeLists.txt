@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pal_karto)
 
-set(ROS_DEPS tf sensor_msgs visualization_msgs roscpp rosconsole nav_msgs message_filters sba open_karto dynamic_reconfigure message_generation pal_map_utils)
+set(ROS_DEPS tf sensor_msgs visualization_msgs geometry_msgs roscpp rosconsole nav_msgs message_filters sba open_karto dynamic_reconfigure message_generation pal_map_utils)
 
 find_package(catkin REQUIRED COMPONENTS ${ROS_DEPS})
 find_package(Eigen REQUIRED)
@@ -32,3 +32,13 @@ foreach(dir launch config)
     install(DIRECTORY ${dir}/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+
+  add_rostest(test/laser_below_range_min.test)
+  add_rostest(test/laser_over_range_max.test)
+  add_rostest(test/laser_nan.test)
+  add_rostest(test/laser_inf_pos.test)
+  add_rostest(test/laser_inf_neg.test)
+endif()

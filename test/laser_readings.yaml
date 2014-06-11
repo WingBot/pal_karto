@@ -1,0 +1,8 @@
+slam_karto:
+  # Scans:
+  minimum_travel_distance: 0.0
+  minimum_travel_heading : 0.0
+  range_threshold        : 8.0
+  use_scan_barycenter    : true
+
+  autostart: false

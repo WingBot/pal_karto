@@ -1,0 +1,5 @@
+<launch>
+  <rosparam file="$(find pal_karto)/test/laser_over_range_max.yaml" command="load"/>
+
+  <include file="$(find pal_karto)/test/laser_readings.xml"/>
+</launch>

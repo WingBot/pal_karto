@@ -1,0 +1,13 @@
+<launch>
+  <rosparam file="$(find pal_karto)/test/laser_readings.yaml" command="load"/>
+
+  <include file="$(find pal_karto)/launch/karto.launch"/>
+
+  <node pkg="pal_karto" type="fake_odom_broadcaster.py" name="fake_odom_broadcaster"/>
+
+  <node pkg="tf" type="static_transform_publisher"
+        name="laser_to_base_tf"
+        args="0 0 0 0 0 0 base_link laser 100"/>
+
+  <test pkg="pal_karto" type="laser_readings.py" test-name="laser_readings" time-limit="60"/>
+</launch>

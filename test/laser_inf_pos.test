@@ -1,0 +1,5 @@
+<launch>
+  <rosparam file="$(find pal_karto)/test/laser_inf_pos.yaml" command="load"/>
+
+  <include file="$(find pal_karto)/test/laser_readings.xml"/>
+</launch>

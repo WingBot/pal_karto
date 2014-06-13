@@ -858,20 +858,20 @@ void SlamKarto::laserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
            it != scan->ranges.rend();
            ++it)
       {
-        if (!std::isfinite(*it) || (*it) < scan->range_min || scan->range_max < (*it))
-          readings.push_back(scan->range_max);
-        else
+        if (scan->range_min < (*it) && (*it) < scan->range_max)
           readings.push_back(*it);
+        else
+          readings.push_back(scan->range_max);
       }
     } else {
       for (std::vector<float>::const_iterator it = scan->ranges.begin();
            it != scan->ranges.end();
            ++it)
       {
-        if (!std::isfinite(*it) || (*it) < scan->range_min || scan->range_max < (*it))
-          readings.push_back(scan->range_max);
-        else
+        if (scan->range_min < (*it) && (*it) < scan->range_max)
           readings.push_back(*it);
+        else
+          readings.push_back(scan->range_max);
       }
     }
 

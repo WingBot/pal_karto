@@ -913,7 +913,7 @@ void SlamKarto::generateTrajectory(const karto::LocalizedRangeScanVector &scans)
 
   if (!path_to_trajectory_file_.empty())
   {
-    pal::slam::saveTrajectory(poses, stamps, path_to_trajectory_file_);
+    pal_map_utils::saveTrajectory(poses, stamps, path_to_trajectory_file_);
   }
 
   trajectory_publisher.publish(poses);
